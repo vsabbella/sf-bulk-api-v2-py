@@ -1,0 +1,56 @@
+#contact = sf.Contact.create({'LastName':'Smith',
+        #                             'Email':'example@example.com',
+         #                            'AccountId':'0017h00000iCPhyAAG',
+        #                             'MailingCountry':'United States'})
+        #print(contact['id'])
+        #sobjectlist = open('sobjectlist.json',)
+        #data = json.load(sobjectlist)
+        #print(data['sobjectlist'])
+        
+        #response = SFBulkJobv2Request.makeRequest(instanceurl,sobject,operation="insert")
+        #jsonres = json.loads(response.text)
+        #print(jsonres["id"])
+
+        # manipulate the session instance (optional)
+
+
+
+        """
+        for i in data['sobjectlist']:
+            print(i)
+            sobjjsonfile = open(i+".json")
+            sobjdata=json.load(sobjjsonfile)
+            print(sobjdata[0])
+            sf.bulk.Product2.insert(sobjdata,batch_size=10000,use_serial=True)
+    
+        """
+
+
+        #print('payload structured')
+    #print(payload)
+    #print(payloadstr)
+
+
+
+  """
+    payLoadLines=[]
+    with open("Product2.csv", newline='\n',encoding='utf-8-sig') as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',')
+        for row in csvreader:
+         payLoadLines.append(''.join(row))     
+    payloadstr=''.join(payLoadLines)
+    """
+
+
+    #csvpayloadgenerator.py 
+
+"""
+payLoadLines=[];
+    with open('Product2.csv','r', encoding='utf-8-sig') as csvfile:
+      csvreader = csv.reader(csvfile, delimiter=',')
+      for row in csvreader:
+       #print(row)
+       payLoadLines.append('\n'.join(row))
+      #response = requests.request("PUT", url, headers=headers, data=payload)
+    print(payLoadLines)
+"""

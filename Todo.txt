@@ -1,0 +1,2 @@
+1. Exec Anonymous API.
+2. Get sessionId from username, pwd+sectoken

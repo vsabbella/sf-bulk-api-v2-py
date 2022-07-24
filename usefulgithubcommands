@@ -1,0 +1,11 @@
+# switch between two users
+tree ~/.ssh  
+cd ~/.ssh
+open -t config
+
+git config user.name "<username>"
+git config user.email "<email>"
+git remote set-url origin <host from config file>:<username>/<git repo>.git
+
+# create a repo using api in github
+curl -u <username>:<personal token in github> https://api.github.com/user/repos -d '{"name":"<name of repo>"}' 

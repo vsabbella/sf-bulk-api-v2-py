@@ -1,0 +1,486 @@
+<html><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style>
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 30px auto 0 auto;
+    padding: 10px;
+  }
+  body[data-mode="light"] {
+    color: #2B2B2B;
+    background-color: #EBEBEB;
+  }
+  body[data-mode="dark"] {
+    color: #D8D8D8;
+    background-color: #464646;
+  }
+  body[data-mode="sepia"] {
+    color: #2B2B2B;
+    background-color: #E7E2D5;
+  }
+  body[data-mode="black"] {
+    color: #ACACAC;
+    background-color: #121212;
+  }
+  body[data-loaded=true] {
+    transition: color 0.4s, background-color 0.4s;
+    margin-top: 56px;
+  }
+  body[data-images=false] img {
+    display: none;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  body[data-links=false] #reader-domain {
+    display: none;
+  }
+  #reader-domain {
+    font-size: 0.9em;
+    line-height: 1.48em;
+    padding-bottom: 4px;
+    font-family: Helvetica, Arial, sans-serif;
+    text-decoration: none;
+    border-bottom-color: currentcolor;
+    color: #0095dd;
+  }
+  #reader-title {
+    font-size: 1.6em;
+    line-height: 1.25em;
+    width: 100%;
+    margin: 20px 0;
+    padding: 0;
+  }
+  #reader-credits {
+    font-size: 0.9em;
+    line-height: 1.48em;
+    margin: 0 0 10px 0;
+    padding: 0;
+    font-style: italic;
+  }
+  #reader-estimated-time {
+    font-size: 0.85em;
+    line-height: 1.48em;
+    margin: 0 0 10px 0;
+    padding: 0;
+  }
+  #reader-credits:empty {
+    disply: none;
+  }
+  </style>
+</head>
+<body data-images="true" data-links="false" data-mode="light" data-font="serif" data-loaded="true">
+  <span></span> <!-- for IntersectionObserver -->
+  <a id="reader-domain" href="https://realpython.com/flask-by-example-part-1-project-setup/">realpython.com</a>
+  <h1 dir="auto" id="reader-title">Deploying a Python Flask Example Application Using Heroku – Real Python</h1>
+  <div dir="auto" id="reader-credits">Real Python</div>
+  <div dir="auto" id="reader-estimated-time">25-32 minutes</div>
+  <hr>
+  <div id="readability-page-1" class="page"><div>
+
+
+<p>In this tutorial, you’ll create a Python <a href="https://flask.palletsprojects.com/">Flask</a> example application and deploy it using <a href="https://heroku.com/">Heroku</a>, making it publicly available on the web. Heroku removes much of the infrastructure burden related to building and running <a href="https://realpython.com/python-web-applications/">web applications</a>, allowing you to focus on creating an awesome app.</p>
+<p>Besides deploying the app, you’ll use Git to track changes to the code, and you’ll also configure a deployment workflow with different environments for staging and production. Using this setup, you’ll be able to test and preview the app before releasing it. </p>
+<p><strong>In this tutorial, you’ll learn how to:</strong></p>
+<ul>
+<li>Create a Python <strong>Flask example web application</strong></li>
+<li><strong>Deploy</strong> the web application using Heroku</li>
+<li>Implement a deployment <strong>workflow</strong> using Heroku <strong>pipelines</strong></li>
+<li>Manage <strong>configuration</strong> and <strong>secrets</strong> for different environments in a secure way</li>
+</ul>
+<p>This tutorial assumes that you understand the basics of how web applications work and that you have some experience using Git. To get up to speed on these topics, check out <a href="https://realpython.com/python-web-applications-with-flask-part-i/">Python Web Applications with Flask (Tutorial Series)</a> and <a href="https://realpython.com/python-git-github-intro/">Introduction to Git and GitHub for Python Developers</a>.</p>
+<p>As you’ll learn through this tutorial, by combining Flask and Heroku, you can minimize the effort required to create and run web applications. You can click the link below to get the full source code for this tutorial’s application:</p>
+
+<section id="creating-the-python-flask-example-application"><h2>Creating the Python Flask Example Application<a href="#creating-the-python-flask-example-application" title="Permanent link"></a></h2>
+<p>In this section, you’ll learn how to create a Python Flask example application and run it locally. You’re going to initialize the project, install Flask, create the application, and run it on your computer. You’ll also learn how to use Git to version your application’s code.</p>
+<section id="initializing-the-project"><h3>Initializing the Project<a href="#initializing-the-project" title="Permanent link"></a></h3>
+<p>The project initialization consists of creating a directory for your application, setting up a <a href="https://realpython.com/python-virtual-environments-a-primer/">Python virtual environment</a> where dependencies will be installed, and initializing the <strong>Git repository</strong>. You don’t have to use a virtual environment or Git for local development, but they are very convenient and will make development and deployment to Heroku simpler.</p>
+<p>Start by creating a new directory for the Python Flask example app. You can do it by running these commands:</p>
+<div><pre><span></span><code><span>$ </span>mkdir realpython-example-app
+<span>$ </span><span>cd</span> realpython-example-app
+</code></pre></div>
+<p>The above commands create a <code>realpython-example-app/</code> folder and change the current working directory to it.</p>
+<p>Next, you must create a Python virtual environment. Using a virtual environment allows you to manage your project’s dependencies without messing with system-level files shared by all applications. Run the following commands to create and activate a virtual environment for your application. Remember to change the directory to <code>realpython-example-app/</code> if you haven’t already:</p>
+<div><pre><span></span><code><span>$ </span>python3 -m venv venv
+<span>$ </span><span>source</span> venv/bin/activate
+</code></pre></div>
+<p>These commands create a virtual environment named <code>venv</code> and activate it, so packages will be loaded and installed from this environment instead of using the system-level packages.</p>
+</section><section id="installing-dependencies"><h3>Installing Dependencies<a href="#installing-dependencies" title="Permanent link"></a></h3>
+<p>The first step is to install the Flask Python package. You can run the following command to install Flask using <a href="https://realpython.com/what-is-pip/"><code>pip</code></a>:</p>
+<div><pre><span></span><code><span>$ </span>python3 -m pip install <span>Flask</span><span>==</span><span>1</span>.1.2
+</code></pre></div>
+<p>The above command installs Flask version <code>1.1.2</code>. This is the version you’ll use throughout this tutorial. Next, you need to create a <code>requirements.txt</code> file listing the project’s dependencies. You can use the <code>python3 -m pip freeze</code> command for this task:</p>
+<div><pre><span></span><code><span>$ </span>python3 -m pip freeze &gt; requirements.txt
+</code></pre></div>
+<p>You’ll use <code>requirements.txt</code> when deploying the project to tell Heroku which packages must be installed to run your application code. To learn more about how to install Flask in a virtual environment and other <code>pip</code> options, check out the <a href="https://flask.palletsprojects.com/en/1.1.x/installation/">Flask installation documentation</a> and <a href="https://realpython.com/what-is-pip/">What Is Pip? A Guide for New Pythonistas</a>. </p>
+<p>Now, the application directory should look like this:</p>
+<div><pre><span></span><code>realpython-example-app/
+│
+├── venv/
+│
+└── requirements.txt
+</code></pre></div>
+<p>In the following sections, you’ll add more files to implement the application logic, set up Git, and then deploy it to Heroku.</p>
+</section><section id="writing-the-application-code"><h3>Writing the Application Code<a href="#writing-the-application-code" title="Permanent link"></a></h3>
+<p>In this section, you’ll create a small Flask application with a single <strong>route</strong>, <code>index</code>, that returns the text <code>Hello World!</code> when requested. To create a Flask application, you have to create a <code>Flask</code> object that represents your app and then associate <strong>views</strong> to routes. Flask takes care of dispatching incoming requests to the correct view based on the request URL and the routes you’ve defined. </p>
+<p>You can click the link below to get the full source code for this tutorial’s application:</p>
+
+<p>For small applications, like the one you’re working with in this tutorial, you can write all the code in a single file, organizing your project as follows:</p>
+<div><pre><span></span><code>realpython-example-app/
+│
+├── venv/
+│
+├── app.py
+└── requirements.txt
+</code></pre></div>
+<p><code>app.py</code> contains the application’s code, where you create the app and its views. The following code block shows the application’s full source code:</p>
+<div><pre><span></span><code><span>from</span> <span>flask</span> <span>import</span> <span>Flask</span>
+
+<span>app</span> <span>=</span> <span>Flask</span><span>(</span><span>__name__</span><span>)</span>
+
+<span>@app</span><span>.</span><span>route</span><span>(</span><span>"/"</span><span>)</span>
+<span>def</span> <span>index</span><span>():</span>
+    <span>return</span> <span>"Hello World!"</span>
+</code></pre></div>
+<p>After you <a href="https://realpython.com/python-import/">import</a> <code>flask</code>, the code creates the object <code>app</code>, which belongs to the <code>Flask</code> class. The view function <code>index()</code> is linked to the main route using the <code>app.route()</code> <a href="https://realpython.com/primer-on-python-decorators/">decorator</a>. When the main route is requested, Flask will serve the request by calling <code>index()</code> and using its return value as the response. </p>
+</section><section id="running-the-python-flask-example-locally"><h3>Running the Python Flask Example Locally<a href="#running-the-python-flask-example-locally" title="Permanent link"></a></h3>
+<p>There are different ways in which you can run the application that you created in the previous section. One of the most straightforward ways to launch a Flask app for local development is using the <code>flask run</code> command from a terminal:</p>
+
+<p>By default, Flask will run the application you defined in <code>app.py</code> on port <code>5000</code>. While the application is running, go to <code>http://localhost:5000</code> using your web browser. You’ll see a web page containing the message <code>Hello World!</code></p>
+<p>During development, you normally want to reload your application automatically whenever you make a change to it. You can do this by passing an environment variable, <code>FLASK_ENV=development</code>, to <code>flask run</code>:</p>
+<div><pre><span></span><code><span>$ </span><span>FLASK_ENV</span><span>=</span>development flask run
+</code></pre></div>
+<p>When you set <code>FLASK_ENV=development</code>, Flask will monitor changes to app files and reload the server when there’s a change. This way, you don’t need to manually stop and restart the app server after each modification.</p>
+</section><section id="tracking-changes-using-git"><h3>Tracking Changes Using Git<a href="#tracking-changes-using-git" title="Permanent link"></a></h3>
+<p>In this tutorial, you’re going to track the changes to your project’s files using Git, a very popular <strong>version control system (VCS)</strong>. So, as a first step, you should create a Git repository for your project. You can achieve this by executing the following command in your project’s directory:</p>
+
+<p>The above command initializes the repository that will be used to track the project’s files. The repository metadata is stored in a hidden directory named <code>.git/</code>. </p>
+<p>Note that there are some folders that you shouldn’t include in the Git repository, like <code>venv/</code> and <code>__pycache__/</code>. You can tell Git to ignore them by creating a file named <code>.gitignore</code>. Use the following commands to create this file:</p>
+<div><pre><span></span><code><span>$ </span><span>echo</span> venv &gt; .gitignore
+<span>$ </span><span>echo</span> __pycache__ &gt;&gt; .gitignore
+<span>$ </span>git add .gitignore app.py requirements.txt
+<span>$ </span>git commit -m <span>"Initialize Git repository"</span>
+</code></pre></div>
+<p>After running the above commands, Git will track changes to your application’s files, but it will ignore the <code>venv/</code> and <code>__pycache__/</code> folders. Now the project directory, <code>realpython-example-app/</code>, should look like this:</p>
+<div><pre><span></span><code>realpython-example-app/
+│
+├── .git/
+│
+├── venv/
+│
+├── .gitignore
+├── app.py
+└── requirements.txt
+</code></pre></div>
+<p>You’re now ready to deploy your app using Heroku. Check out <a href="https://realpython.com/python-git-github-intro/">Introduction to Git and GitHub for Python Developers</a> to learn more about Git and how you can host your repository in GitHub. </p>
+</section></section><section id="deploying-the-application-to-heroku"><h2>Deploying the Application to Heroku<a href="#deploying-the-application-to-heroku" title="Permanent link"></a></h2>
+<p>Heroku makes building and deploying applications really friendly for developers. It removes much of the burden related to building and running web applications, taking care of most infrastructure details and letting you focus on creating and improving the app. Some of the details handled by Heroku include:</p>
+<ul>
+<li>Provisioning HTTPS certificates</li>
+<li>Managing DNS records</li>
+<li>Running and maintaining servers</li>
+</ul>
+<p>Throughout the rest of this section, you’ll learn how to deploy the previously created web application to the internet using Heroku. By the end of this section, your app will be publicly available under a nice URL and served using <a href="https://realpython.com/python-https/">HTTPS</a>.</p>
+<section id="heroku-account-setup"><h3>Heroku Account Setup<a href="#heroku-account-setup" title="Permanent link"></a></h3>
+<p>Your first step is to create a Heroku account. If you don’t have one already, you can use the Free and Hobby plan. It allows you to deploy noncommercial applications, personal projects, and experiments without spending money.</p>
+<p>If you go to the <a href="https://signup.heroku.com/">Heroku sign-up page</a>, you’ll see the following fields on the sign-up form:</p>
+<figure><a href="https://files.realpython.com/media/mgarcia-heroku-signup.c6ea98615f60.png" target="_blank"><img loading="lazy" src="https://files.realpython.com/media/mgarcia-heroku-signup.c6ea98615f60.png" width="969" height="986" srcset="https://robocrop.realpython.net/?url=https%3A//files.realpython.com/media/mgarcia-heroku-signup.c6ea98615f60.png&amp;w=242&amp;sig=67d6ae36cce856af9ccdb872c8c6f02c395b0d37 242w, https://robocrop.realpython.net/?url=https%3A//files.realpython.com/media/mgarcia-heroku-signup.c6ea98615f60.png&amp;w=484&amp;sig=c27df59765bcf1043bf6f6ae6ddcb0d6bfa2ec17 484w, https://files.realpython.com/media/mgarcia-heroku-signup.c6ea98615f60.png 969w" sizes="75vw" alt="Heroku sign up screen" data-asset="3447"></a></figure>
+<p>You’ll be able to start using Heroku after completing the required information and confirming your email address.</p>
+</section><section id="heroku-command-line-interface-cli"><h3>Heroku Command-Line Interface (CLI)<a href="#heroku-command-line-interface-cli" title="Permanent link"></a></h3>
+<p>The Heroku command-line interface (CLI) is a tool that allows you to create and manage Heroku applications from the terminal. It’s the quickest and the most convenient way to deploy your application. You can check the <a href="https://devcenter.heroku.com/articles/heroku-cli">developer’s documentation</a> for installation instructions for your operating system. On most Linux distributions, you can install the Heroku CLI by running the following command:</p>
+<div><pre><span></span><code><span>$ </span>curl https://cli-assets.heroku.com/install.sh <span>|</span> sh
+</code></pre></div>
+<p>The previous command downloads the Heroku CLI installer and executes it. Next, you have to log in by running the following command:</p>
+
+<p>This opens a website with a button to complete the login process. Click <em>Log In</em> to complete the authentication process and start using the Heroku CLI:</p>
+<figure><a href="https://files.realpython.com/media/mgarcia-heroku-login.8a271deda9af.png" target="_blank"><img loading="lazy" src="https://files.realpython.com/media/mgarcia-heroku-login.8a271deda9af.png" width="568" height="401" srcset="https://robocrop.realpython.net/?url=https%3A//files.realpython.com/media/mgarcia-heroku-login.8a271deda9af.png&amp;w=142&amp;sig=87ab3a345cf6c5b3e587a230c7a3f9787321ebb6 142w, https://robocrop.realpython.net/?url=https%3A//files.realpython.com/media/mgarcia-heroku-login.8a271deda9af.png&amp;w=284&amp;sig=a818791ce25f8754cdd5ebd9e4739fdd0308e66e 284w, https://files.realpython.com/media/mgarcia-heroku-login.8a271deda9af.png 568w" sizes="75vw" alt="Heroku login screen" data-asset="3448"></a></figure>
+<p>After logging in, you’re ready to start using the Heroku CLI to manage your applications and workflows.</p>
+</section><section id="application-deployment-to-heroku"><h3>Application Deployment to Heroku<a href="#application-deployment-to-heroku" title="Permanent link"></a></h3>
+<p>In this section, you’ll learn how to use the Heroku CLI and Git to deploy your web application. The first step is to create a file named <code>Procfile</code> in the project’s root directory. This file tells Heroku how to run the app. You can create it by running the following command:</p>
+<div><pre><span></span><code><span>$ </span><span>echo</span> <span>"web: gunicorn app:app"</span> &gt; Procfile
+</code></pre></div>
+<p>Note that this filename must start with a capital letter. This file tells Heroku to serve your application using <a href="https://gunicorn.org/">Gunicorn</a>, a Python <strong>Web Server Gateway Interface (WSGI) HTTP server</strong> compatible with various web frameworks, including Flask. Make sure to install Gunicorn and update the <code>requirements.txt</code> file using <code>pip</code>:</p>
+<div><pre><span></span><code><span>$ </span>python3 -m pip install <span>gunicorn</span><span>==</span><span>20</span>.0.4
+<span>$ </span>python3 -m pip freeze &gt; requirements.txt
+</code></pre></div>
+<p>The previous commands install Gunicorn and update <code>requirements.txt</code> to contain the list of all dependencies. Since you added and changed files, you need to commit them to Git. You can do this by executing the following two commands:</p>
+<div><pre><span></span><code><span>$ </span>git add Procfile requirements.txt
+<span>$ </span>git commit -m <span>"Add Heroku deployment files"</span>
+</code></pre></div>
+<p>When you execute the above commands, you’ll commit the latest versions of <code>Procfile</code> and <code>requirements.txt</code> to the Git repository. Now you’re ready to deploy the application to Heroku. Start by <a href="https://devcenter.heroku.com/articles/creating-apps">creating a Heroku application</a> using the Heroku CLI.</p>
+<p><strong>Note:</strong> This tutorial uses <code>realpython-example-app</code> as the application name. Since application names need to be unique on Heroku, you’ll need to choose a different name for your deployment.</p>
+<p>You can create the application in Heroku by running the following command:</p>
+<div><pre><span></span><code><span>$ </span>heroku create realpython-example-app
+</code></pre></div>
+<p>Running the above command initializes the Heroku application, creating a <a href="https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes">Git remote</a> named <code>heroku</code>. Next, you can push the Git repository to this remote to trigger the building and deployment process:</p>
+
+<p>After pushing the <code>master</code> branch to the <code>heroku</code> remote, you’ll see that the output displays information about the building and deployment process:</p>
+<div><pre><span></span><code><span> 1</span><span>Enumerating objects: 6, done.</span>
+<span> 2</span><span>Counting objects: 100% (6/6), done.</span>
+<span> 3</span><span>Delta compression using up to 8 threads</span>
+<span> 4</span><span>Compressing objects: 100% (4/4), done.</span>
+<span> 5</span><span>Writing objects: 100% (6/6), 558 bytes | 558.00 KiB/s, done.</span>
+<span> 6</span><span>Total 6 (delta 0), reused 0 (delta 0)</span>
+<span> 7</span><span>remote: Compressing source files... done.</span>
+<span> 8</span><span>remote: Building source:</span>
+<span> 9</span><span>remote:</span>
+<span>10</span><span>remote: -----&gt; Building on the Heroku-18 stack</span>
+<span>11</span><span>remote: -----&gt; Python app detected</span>
+<span>12</span><span>remote: -----&gt; Installing python-3.6.12</span>
+<span>13</span><span>remote: -----&gt; Installing pip 20.1.1, setuptools 47.1.1 and wheel 0.34.2</span>
+<span>14</span><span>remote: -----&gt; Installing SQLite3</span>
+<span>15</span><span>remote: -----&gt; Installing requirements with pip</span>
+<span>16</span><span>remote:        Collecting click==7.1.2</span>
+<span>17</span><span>remote:          Downloading click-7.1.2-py2.py3-none-any.whl (82 kB)</span>
+<span>18</span><span>remote:        Collecting Flask==1.1.2</span>
+<span>19</span><span>remote:          Downloading Flask-1.1.2-py2.py3-none-any.whl (94 kB)</span>
+<span>20</span><span>remote:        Collecting itsdangerous==1.1.0</span>
+<span>21</span><span>remote:          Downloading itsdangerous-1.1.0-py2.py3-none-any.whl (16 kB)</span>
+<span>22</span><span>remote:        Collecting Jinja2==2.11.2</span>
+<span>23</span><span>remote:          Downloading Jinja2-2.11.2-py2.py3-none-any.whl (125 kB)</span>
+<span>24</span><span>remote:        Collecting MarkupSafe==1.1.1</span>
+<span>25</span><span>remote:          Downloading MarkupSafe-1.1.1-cp36-cp36m-manylinux1_x86_64.whl</span>
+<span>26</span><span>remote:        Collecting Werkzeug==1.0.1</span>
+<span>27</span><span>remote:          Downloading Werkzeug-1.0.1-py2.py3-none-any.whl (298 kB)</span>
+<span>28</span><span>remote:        Installing collected packages: click, Werkzeug, itsdangerous,</span>
+<span>29</span><span>MarkupSafe, Jinja2, Flask</span>
+<span>30</span><span>remote:        Successfully installed Flask-1.1.2 Jinja2-2.11.2 MarkupSafe-1.1.1</span>
+<span>31</span><span>Werkzeug-1.0.1 click-7.1.2 itsdangerous-1.1.0</span>
+<span>32</span><span>remote: -----&gt; Discovering process types</span>
+<span>33</span><span>remote:        Procfile declares types -&gt; (none)</span>
+<span>34</span><span>remote:</span>
+<span>35</span><span>remote: -----&gt; Compressing...</span>
+<span>36</span><span>remote:        Done: 45.1M</span>
+<span>37</span><span>remote: -----&gt; Launching...</span>
+<span>38</span><span>remote:        Released v1</span>
+<span>39</span><span>remote:        https://realpython-example-app.herokuapp.com/ deployed to Heroku</span>
+<span>40</span><span>remote:</span>
+<span>41</span><span>remote: Verifying deploy... done.</span>
+<span>42</span><span>To https://git.heroku.com/realpython-example-app.git</span>
+<span>43</span><span> * [new branch]      master -&gt; master</span>
+</code></pre></div>
+<p>Congratulations, the app is now online! The output shows the building process, including the installation of dependencies and the deployment. On line 39, you’ll find the URL for your application. In this case, it’s <code>https://realpython-example-app.herokuapp.com/</code>. You can also use the following Heroku CLI command to open your app’s URL:</p>
+
+<p>The above command will open your application using your default web browser.</p>
+<p><strong>Note:</strong> Line 12 of the output indicates that Python 3.6.12 will be used as your application’s runtime. This was the default version at the time of writing this tutorial. To learn how you can customize the Python version and other runtime settings, check out <a href="https://devcenter.heroku.com/articles/python-runtimes">Heroku’s Python runtime documentation</a>.</p>
+<p>Now let’s make a small change to the app and see how you can redeploy it. Edit <code>app.py</code> and modify the string returned by <code>index()</code> as shown in the next code block:</p>
+<div><pre><span></span><code><span> 1</span><span>from</span> <span>flask</span> <span>import</span> <span>Flask</span>
+<span> 2</span>
+<span> 3</span><span>app</span> <span>=</span> <span>Flask</span><span>(</span><span>__name__</span><span>)</span>
+<span> 4</span>
+<span> 5</span><span>@app</span><span>.</span><span>route</span><span>(</span><span>"/"</span><span>)</span>
+<span> 6</span><span>def</span> <span>index</span><span>():</span>
+<span> 7</span><span>    <span>return</span> <span>"Hello this is the new version!"</span>
+</span></code></pre></div>
+<p>As you see on line 7, <code>"Hello World!"</code> was replaced by <code>"Hello this is the new version!"</code> You can deploy this version to Heroku by committing and pushing the changes to the <code>heroku</code> remote:</p>
+<div><pre><span></span><code><span>$ </span>git add app.py
+<span>$ </span>git commit -m <span>"Change the welcome message"</span>
+<span>$ </span>git push heroku master
+</code></pre></div>
+<p>With these commands, you commit the changes to the local Git repository and push them to the <code>heroku</code> remote. This triggers the building and deployment process again. You can repeat these steps whenever you need to deploy a new version of your application. You’ll notice that subsequent deployments usually take less time because the requirements are already installed.</p>
+<p>In this section, you learned how to create and deploy your application on Heroku using Git and the Heroku CLI. For more details about using the Heroku CLI to deploy Python applications, check out <a href="https://devcenter.heroku.com/articles/getting-started-with-python">Getting Started on Heroku with Python</a>.</p>
+</section></section><section id="using-heroku-pipelines-to-implement-a-deployment-workflow"><h2>Using Heroku Pipelines to Implement a Deployment Workflow<a href="#using-heroku-pipelines-to-implement-a-deployment-workflow" title="Permanent link"></a></h2>
+<p>In this section, you’ll learn how to implement a workflow for your application deployment using <a href="https://devcenter.heroku.com/articles/pipelines">Heroku pipelines</a>. This particular workflow uses three separate environments called <strong>local</strong>, <strong>staging</strong>, and <strong>production</strong>. This kind of setup is widely used in professional projects since it allows testing and reviewing new versions before deploying them to production and putting them in front of real users.</p>
+<section id="understanding-the-deployment-workflow"><h3>Understanding the Deployment Workflow<a href="#understanding-the-deployment-workflow" title="Permanent link"></a></h3>
+<p>As you saw above, when you use this workflow, you’ll run the application in three separate environments:</p>
+<ol>
+<li><strong>Development</strong> is the local environment.</li>
+<li><strong>Staging</strong> is the preproduction environment used for previews and testing.</li>
+<li><strong>Production</strong> is the live site accessed by final users.</li>
+</ol>
+<p>In previous sections, you saw how to run the application on your local environment and in the production environment on Heroku. Adding a staging environment can greatly benefit the development process. The main purpose of this environment is to integrate changes from all new branches and to run the integration tests against the build, which will become the next release. </p>
+<p>Next, you’ll see how to create the staging environment in Heroku and how to create a <strong>pipeline</strong> to <strong>promote</strong> versions from staging to production. The following diagram shows this workflow:</p>
+<figure><a href="https://files.realpython.com/media/Screenshot_from_2021-02-23_21-22-54.25cbf5994a91.png" target="_blank"><img loading="lazy" src="https://files.realpython.com/media/Screenshot_from_2021-02-23_21-22-54.25cbf5994a91.png" width="1676" height="541" srcset="https://robocrop.realpython.net/?url=https%3A//files.realpython.com/media/Screenshot_from_2021-02-23_21-22-54.25cbf5994a91.png&amp;w=419&amp;sig=c0781d5eb0d210958650cacbd90eb6bef79dd4e5 419w, https://robocrop.realpython.net/?url=https%3A//files.realpython.com/media/Screenshot_from_2021-02-23_21-22-54.25cbf5994a91.png&amp;w=838&amp;sig=8219ba085cb53fbe1686176a6951c6b1f08afa31 838w, https://files.realpython.com/media/Screenshot_from_2021-02-23_21-22-54.25cbf5994a91.png 1676w" sizes="75vw" alt="Deployment workflow diagram" data-asset="3449"></a></figure>
+<p>The above image shows the three environments, the activities that happen in each of them, and the deployment and promotion steps.</p>
+</section><section id="implementing-the-deployment-workflow-in-heroku"><h3>Implementing the Deployment Workflow in Heroku<a href="#implementing-the-deployment-workflow-in-heroku" title="Permanent link"></a></h3>
+<p>Implementing the workflow in Heroku consists of two steps:</p>
+<ol>
+<li>Creating separate applications for staging and production</li>
+<li>Making both applications part of the same pipeline</li>
+</ol>
+<p>A <strong>Heroku pipeline</strong> is a group of applications tied together by a workflow. Each one of these applications is an environment in the development workflow, like staging or production. Using pipelines guarantees that, after promotion, production will run the exact same code that you reviewed in staging.</p>
+<p>In this tutorial, the previously created Heroku application <code>realpython-example-app</code> is used as the production environment. You should create a new Heroku app for the staging environment using these commands:</p>
+<div><pre><span></span><code><span>$ </span>heroku create realpython-example-app-staging --remote staging
+<span>$ </span>git push staging master
+</code></pre></div>
+<p>Running these commands creates a new Heroku app named <code>realpython-example-app-staging</code> and deploys the application to it using Git. You can then access the staging app at <code>https://realpython-example-app-staging.herokuapp.com/</code>. Note that a Git remote named <code>staging</code> is associated with this application.</p>
+<p>Now that you have Heroku applications for production and staging, you’re ready to create a Heroku pipeline that links them together. You can use the Heroku CLI to create the pipeline:</p>
+<div><pre><span></span><code><span>$ </span>heroku pipelines:create --app realpython-example-app <span>\</span>
+    --stage production <span>\</span>
+    realpython-example-app
+<span>Creating realpython-example-app pipeline... done</span>
+<span>Adding ⬢ realpython-example-app to realpython-example-app pipeline as production</span>
+<span>... done</span>
+</code></pre></div>
+<p>The command above creates a pipeline named <code>realpython-example-app</code> and adds the app named <code>realpython-example-app</code> as the production environment. Next, run the following command to create a Git remote that points to this app, naming it <code>prod</code>:</p>
+<div><pre><span></span><code><span>$ </span>heroku git:remote --app realpython-example-app --remote prod
+</code></pre></div>
+<p>From now on, you can refer to the production deployment as <code>prod</code>.</p>
+<p>Next, add the staging application to the same pipeline by running the following command:</p>
+<div><pre><span></span><code><span>$ </span>heroku pipelines:add realpython-example-app <span>\</span>
+  --app realpython-example-app-staging <span>\</span>
+  --stage staging
+<span>Adding ⬢ realpython-example-app-staging to realpython-example-app pipeline as</span>
+<span>staging... done</span>
+</code></pre></div>
+<p>This command adds the app <code>realpython-example-app-staging</code> to the same pipeline and specifies that this app must be used for the <code>staging</code> stage. This means that your pipeline now consists of two apps:</p>
+<ol>
+<li><code>realpython-example-app</code></li>
+<li><code>realpython-example-app-staging</code> </li>
+</ol>
+<p>The first one is used as the production environment, and the second one is used as the staging environment.</p>
+</section><section id="deploying-and-promoting-to-staging-and-production"><h3>Deploying and Promoting to Staging and Production<a href="#deploying-and-promoting-to-staging-and-production" title="Permanent link"></a></h3>
+<p>Now that you have your applications and pipeline configured, you can use it to deploy your application to staging, review it there, and then promote it to production.</p>
+<p>Suppose for example that you want to change the message returned by the <code>index()</code> view again. In that case, you have to edit <code>app.py</code> and change the string returned by <code>index()</code>. The following code block shows the new version:</p>
+<div><pre><span></span><code><span> 1</span><span>from</span> <span>flask</span> <span>import</span> <span>Flask</span>
+<span> 2</span>
+<span> 3</span><span>app</span> <span>=</span> <span>Flask</span><span>(</span><span>__name__</span><span>)</span>
+<span> 4</span>
+<span> 5</span><span>@app</span><span>.</span><span>route</span><span>(</span><span>"/"</span><span>)</span>
+<span> 6</span><span>def</span> <span>index</span><span>():</span>
+<span> 7</span><span>    <span>return</span> <span>"This is yet another version!"</span>
+</span></code></pre></div>
+<p>As you see on line 7, <code>index()</code> returns <code>"This is yet another version!"</code> You can deploy this new version to your staging environment by running the following commands:</p>
+<div><pre><span></span><code><span>$ </span>git add app.py
+<span>$ </span>git commit -m <span>"Another change to the welcome message"</span>
+<span>$ </span>git push staging master
+</code></pre></div>
+<p>These commands commit <code>app.py</code> and push the changes to the <code>staging</code> remote, triggering the building and deployment process for this environment. You should see the new version deployed at <code>https://realpython-example-app-staging.herokuapp.com/</code>. Note that the production environment is still using the previous version.</p>
+<p>When you’re happy with the changes, you can promote the new version to production using the Heroku CLI:</p>
+<div><pre><span></span><code><span>$ </span>heroku pipelines:promote --remote staging
+</code></pre></div>
+<p>The above command deploys to production the exact same version that is currently running in staging. As you’ll notice, in this case, there’s no build step since the same build from staging is used and deployed to production. You can verify at <code>https://realpython-example-app.herokuapp.com/</code> that the application was promoted and that it’s running the latest version.</p>
+<p>In this section, you learned about the deployment workflow and implemented it in Heroku. To learn more about working with pipelines and more advanced workflows, check out the <a href="https://devcenter.heroku.com/articles/pipelines">Heroku pipelines documentation</a>.</p>
+</section></section><section id="managing-settings-and-secrets-for-different-environments"><h2>Managing Settings and Secrets for Different Environments<a href="#managing-settings-and-secrets-for-different-environments" title="Permanent link"></a></h2>
+<p>Most applications require different settings for each environment to do things like enabling debugging features or pointing to other databases. Some of these settings, like <strong>authentication credentials</strong>, <strong>database passwords</strong>, and <strong>API keys</strong>, are very sensitive, so you must avoid hard-coding them into the application files.</p>
+<p>You can create a <code>config.py</code> file to hold the non-sensitive configuration values and read the sensitive ones from <strong>environment variables</strong>. In the following code block, you can see the source code for <code>config.py</code>:</p>
+<div><pre><span></span><code><span> 1</span><span>import</span> <span>os</span>
+<span> 2</span>
+<span> 3</span><span>class</span> <span>Config</span><span>:</span>
+<span> 4</span>    <span>DEBUG</span> <span>=</span> <span>False</span>
+<span> 5</span>    <span>DEVELOPMENT</span> <span>=</span> <span>False</span>
+<span> 6</span>    <span>SECRET_KEY</span> <span>=</span> <span>os</span><span>.</span><span>getenv</span><span>(</span><span>"SECRET_KEY"</span><span>,</span> <span>"this-is-the-default-key"</span><span>)</span>
+<span> 7</span>
+<span> 8</span><span>class</span> <span>ProductionConfig</span><span>(</span><span>Config</span><span>):</span>
+<span> 9</span>    <span>pass</span>
+<span>10</span>
+<span>11</span><span>class</span> <span>StagingConfig</span><span>(</span><span>Config</span><span>):</span>
+<span>12</span>    <span>DEBUG</span> <span>=</span> <span>True</span>
+<span>13</span>
+<span>14</span><span>class</span> <span>DevelopmentConfig</span><span>(</span><span>Config</span><span>):</span>
+<span>15</span>    <span>DEBUG</span> <span>=</span> <span>True</span>
+<span>16</span>    <span>DEVELOPMENT</span> <span>=</span> <span>True</span>
+</code></pre></div>
+<p>This code declares a <code>Config</code> class used as the base for each environment’s configuration. Note that on line 6, <code>SECRET_KEY</code> is read from an environment variable using <code>os.getenv()</code>. This avoids disclosing the actual key in the source code. At the same time, you can customize any option for each environment.</p>
+<p>Next, you have to modify <code>app.py</code> to use a different configuration class depending on the environment. This is the full source code of <code>app.py</code>:</p>
+<div><pre><span></span><code><span> 1</span><span><span>import</span> <span>os</span>
+</span><span> 2</span><span>from</span> <span>flask</span> <span>import</span> <span>Flask</span>
+<span> 3</span>
+<span> 4</span><span>app</span> <span>=</span> <span>Flask</span><span>(</span><span>__name__</span><span>)</span>
+<span> 5</span><span><span>env_config</span> <span>=</span> <span>os</span><span>.</span><span>getenv</span><span>(</span><span>"APP_SETTINGS"</span><span>,</span> <span>"config.DevelopmentConfig"</span><span>)</span>
+</span><span> 6</span><span><span>app</span><span>.</span><span>config</span><span>.</span><span>from_object</span><span>(</span><span>env_config</span><span>)</span>
+</span><span> 7</span>
+<span> 8</span><span>@app</span><span>.</span><span>route</span><span>(</span><span>"/"</span><span>)</span>
+<span> 9</span><span>def</span> <span>index</span><span>():</span>
+<span>10</span><span>    <span>secret_key</span> <span>=</span> <span>app</span><span>.</span><span>config</span><span>.</span><span>get</span><span>(</span><span>"SECRET_KEY"</span><span>)</span>
+</span><span>11</span><span>    <span>return</span> <span>f</span><span>"The configured secret key is </span><span>{</span><span>secret_key</span><span>}</span><span>."</span>
+</span></code></pre></div>
+<p>On lines 5 and 6, the configuration is loaded from one of the previously defined classes in <code>config.py</code>. The specific configuration class will depend on the value stored in the <code>APP_SETTINGS</code> environment variable. If the variable is undefined, the configuration will fall back to <code>DevelopmentConfig</code> by default.</p>
+<p><strong>Note:</strong> For this example, the message on line 11 was modified to show the <code>SECRET_KEY</code> obtained by <code>app.config.get()</code>. You don’t typically display sensitive information as part of your responses. This is just an example to show how you can read these values.</p>
+<p>Now you can see how this works locally by passing some environment variables when launching the app:</p>
+<div><pre><span></span><code><span>$ </span><span>SECRET_KEY</span><span>=</span>key-read-from-env-var flask run
+</code></pre></div>
+<p>The above command sets the <code>SECRET_KEY</code> environment variable and starts the application. If you navigate to <code>http://localhost:5000</code>, then you should see the message <code>The configured secret key is key-read-from-env-var</code>.</p>
+<p>Next, commit the changes and push them to the staging environment by running the following commands:</p>
+<div><pre><span></span><code><span>$ </span>git add app.py config.py
+<span>$ </span>git commit -m <span>"Add config support"</span>
+<span>$ </span>git push staging master
+</code></pre></div>
+<p>These commands commit changes in <code>app.py</code> and the new <code>config.py</code> file to the local Git repository and then push them to the staging environment, which triggers a new building and deployment process. Before proceeding, you can customize the environment variables for this environment using the Heroku CLI:</p>
+<div><pre><span></span><code><span>$ </span>heroku config:set --remote staging <span>\</span>
+  <span>SECRET_KEY</span><span>=</span>the-staging-key <span>\</span>
+  <span>APP_SETTINGS</span><span>=</span>config.StagingConfig
+</code></pre></div>
+<p>Using the <code>config:set</code> command, you’ve set the value of <code>SECRET_KEY</code> and <code>APP_SETTINGS</code> for staging. You can verify that the changes were deployed by going to <code>https://realpython-example-app-staging.herokuapp.com/</code> and checking that the page shows the message <code>The configured secret key is the-staging-key</code>.</p>
+<p>Using Heroku CLI, you can also get the values of the environment variables for any app. The following command gets all the environment variables set for the staging environment from Heroku:</p>
+<div><pre><span></span><code><span>$ </span>heroku config --remote staging
+<span>=== realpython-example-app-staging Config Vars</span>
+<span>APP_SETTINGS: config.StagingConfig</span>
+<span>SECRET_KEY:   the-staging-key</span>
+</code></pre></div>
+<p>As you can see, these values match the previously set ones. </p>
+<p>Finally, you can promote the new version to production with different configuration values using the Heroku CLI:</p>
+<div><pre><span></span><code><span>$ </span>heroku config:set --remote prod <span>\</span>
+  <span>SECRET_KEY</span><span>=</span>the-production-key <span>\</span>
+  <span>APP_SETTINGS</span><span>=</span>config.ProductionConfig
+<span>$ </span>heroku pipelines:promote --remote staging
+</code></pre></div>
+<p>The first command sets the values of <code>SECRET_KEY</code> and <code>APP_SETTINGS</code> for the production environment. The second command promotes the new app version, the one that has the <code>config.py</code> file. Again, you can verify that the changes were deployed by going to <code>https://realpython-example-app.herokuapp.com/</code> and checking that the page shows <code>The configured secret key is the-production-key</code>.</p>
+<p>In this section, you learned how to use a different configuration for each environment and how to handle sensitive settings using environment variables. Remember that in real-world applications, you shouldn’t expose sensitive information like <code>SECRET_KEY</code>.</p>
+</section><section id="conclusion"><h2>Conclusion<a href="#conclusion" title="Permanent link"></a></h2>
+<p>Congratulations, you now know how to create a web application using Flask and how to make it publicly available by deploying it with Heroku. You also know how to set up different environments where you, your team, and your customers can review the app before publishing it. While the example application created in this tutorial is very small, you can use it as the starting point for your next project!</p>
+<p><strong>In this tutorial, you learned how to:</strong></p>
+<ul>
+<li>Create a Python <strong>Flask example web application</strong></li>
+<li>Deploy the web application using <strong>Heroku</strong></li>
+<li>Implement a deployment <strong>workflow</strong> using Heroku <strong>pipelines</strong></li>
+<li>Manage <strong>configuration and secrets</strong> for different environments in a secure way</li>
+</ul>
+<p>Heroku offers many features that weren’t covered in the previous sections, including scaling, databases, and more. Check out the <a href="https://devcenter.heroku.com/">Heroku Dev Center</a> and the <a href="https://www.heroku.com/platform">Heroku platform documentation</a> to learn about other features that will help you accelerate your development. Finally, check out the tutorial series <a href="https://realpython.com/flask-by-example-part-1-project-setup/">Flask by Example</a> to see how you can create and deploy a more complex application.</p>
+<p>You can click the link below to get the full source code for this tutorial’s application:</p>
+
+</section>
+
+</div></div>
+  <span></span> <!-- for IntersectionObserver -->
+
+</body><style>@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=IBM+Plex+Serif:wght@400;500;700&family=Montserrat:wght@400;700&family=Zilla+Slab:wght@400;500&display=swap'); body {
+      font-size:  17px;
+      font-family: 'IBM Plex Serif', serif;
+      line-height: 28px;
+      width: 850px;
+    }</style><style>body {
+  padding-bottom: 64px;
+}
+a:link, a:link:hover, a:link:active {
+  color: #0095dd;
+}
+a:visited {
+  color: #d33bf0;
+}
+a:link {
+  text-decoration: none;
+  font-weight: normal;
+}
+pre {
+  white-space: pre-wrap;
+}
+pre code {
+  background-color: #eff0f1;
+  color: #393318;
+  font-family: monospace;
+  display: block;
+  padding: 5px 10px;
+}
+body[data-mode="dark"] pre code {
+  background-color: #585858;
+  color: #e8e8e8;
+}
+
+/* CSS for sans-serif fonts */
+body[data-font=sans-serif] {}
+/* CSS for serif fonts */
+body[data-font=serif] {}
+
+/* CSS for "sepia" theme */
+body[data-mode=sepia] {
+}
+/* CSS for "light" theme */
+body[data-mode=light] {}
+/* CSS for "dark" theme */
+body[data-mode=dark] {}</style></html>
